@@ -21,7 +21,7 @@ This project provides a ready-to-use **autocomplete service** with frontend and 
 1. **Clone the repo:**
 
 ```bash
-git clone https://github.com/Prem-099/AutoComplete-Servcie.git
+git clone https://github.com/Prem-099/AutoComplete-Service.git
 cd AutoComplete-Servcie
 ```
 
