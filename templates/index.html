@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autocomplete Search</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        #search-box {
+            width: 300px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #suggestions {
+            border: 1px solid #ccc;
+            max-width: 300px;
+            background: white;
+            position: absolute;
+        }
+        .suggestion {
+            padding: 8px;
+            cursor: pointer;
+        }
+        .suggestion:hover {
+            background: #f0f0f0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Autocomplete Search</h1>
+    <input type="text" id="search-box" placeholder="Type to search...">
+    <div id="suggestions"></div>
+
+    <script>
+        let debounceTimer;
+
+        document.getElementById("search-box").addEventListener("input", () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(fetchSuggestions, 300); // wait 300ms
+        });
+
+        async function fetchSuggestions() {
+            const query = document.getElementById("search-box").value;
+            if (!query) {
+                document.getElementById("suggestions").innerHTML = "";
+                return;
+            }
+
+            try {
+                const res = await fetch(`/autocomplete?prefix=${query}`);
+                const suggestions = await res.json();
+
+                let html = "";
+                for (let item of suggestions) {
+                    html += `<div class="suggestion">${item}</div>`;
+                }
+                document.getElementById("suggestions").innerHTML = html;
+
+                // Add click events
+                document.querySelectorAll(".suggestion").forEach(el => {
+                    el.onclick = async () => {
+                        document.getElementById("search-box").value = el.innerText;
+                        document.getElementById("suggestions").innerHTML = "";
+
+                        // Record search
+                        await fetch(`/search?term=${el.innerText}`, { method: "POST" });
+                    };
+                });
+
+            } catch (err) {
+                console.error("Error fetching suggestions:", err);
+            }
+        }
+    </script>
+</body>
+</html>
